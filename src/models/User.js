@@ -83,11 +83,10 @@ export class User {
       .input('FullName', sql.NVarChar, userData.fullName)
       .input('Role', sql.NVarChar, userData.role)
       .input('CommandSetupDetailID', sql.Int, userData.commandSetupDetailID || null)
-      .input('UpdatedAt', sql.DateTime, new Date())
       .query(`
         UPDATE Users
         SET Username = @Username, Password = @Password, FullName = @FullName, 
-            Role = @Role, CommandSetupDetailID = @CommandSetupDetailID, UpdatedAt = @UpdatedAt
+            Role = @Role, CommandSetupDetailID = @CommandSetupDetailID, UpdatedAt = GETDATE()
         OUTPUT INSERTED.*
         WHERE UserID = @UserID
       `);

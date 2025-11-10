@@ -2,7 +2,7 @@ import sql from 'mssql';
 import { getConnection } from '../config/database.js';
 
 export class Equipment {
-  // Get all equipments with joined data
+  // Get all equipments with joined data (only active ones)
   static async getAll() {
     const pool = await getConnection();
     const result = await pool.request()
@@ -10,18 +10,22 @@ export class Equipment {
         SELECT e.*, 
                sd.SetupDetailName as EquipmentTypeName,
                s.SetupName,
-               u.Username as CreatedByUsername,
-               u.FullName as CreatedByFullName
+               un.UnitName as UnitName,
+               un.UnitCode as UnitCode,
+               usr.Username as CreatedByUsername,
+               usr.FullName as CreatedByFullName
         FROM Equipments e
         LEFT JOIN SetupDetails sd ON e.EquipmentTypeSetupDetailID = sd.SetupDetailID
         LEFT JOIN Setup s ON sd.SMSID = s.SMSID
-        LEFT JOIN Users u ON e.CreatedBy = u.UserID
-        ORDER BY e.CreatedAt DESC
+        LEFT JOIN Unit un ON CAST(e.Unit AS INT) = un.UnitID
+        LEFT JOIN Users usr ON e.CreatedBy = usr.UserID
+        WHERE e.isActive = 1
+        ORDER BY e.UpdatedAt DESC, e.CreatedAt DESC
       `);
     return result.recordset;
   }
 
-  // Get equipment by ID
+  // Get equipment by ID (only if active)
   static async getById(equipmentId) {
     const pool = await getConnection();
     const result = await pool.request()
@@ -30,18 +34,21 @@ export class Equipment {
         SELECT e.*, 
                sd.SetupDetailName as EquipmentTypeName,
                s.SetupName,
-               u.Username as CreatedByUsername,
-               u.FullName as CreatedByFullName
+               un.UnitName as UnitName,
+               un.UnitCode as UnitCode,
+               usr.Username as CreatedByUsername,
+               usr.FullName as CreatedByFullName
         FROM Equipments e
         LEFT JOIN SetupDetails sd ON e.EquipmentTypeSetupDetailID = sd.SetupDetailID
         LEFT JOIN Setup s ON sd.SMSID = s.SMSID
-        LEFT JOIN Users u ON e.CreatedBy = u.UserID
-        WHERE e.EquipmentID = @EquipmentID
+        LEFT JOIN Unit un ON CAST(e.Unit AS INT) = un.UnitID
+        LEFT JOIN Users usr ON e.CreatedBy = usr.UserID
+        WHERE e.EquipmentID = @EquipmentID AND e.isActive = 1
       `);
     return result.recordset[0];
   }
 
-  // Get equipments by Equipment Type SetupDetail ID
+  // Get equipments by Equipment Type SetupDetail ID (only active ones)
   static async getByEquipmentTypeSetupDetailId(equipmentTypeSetupDetailId) {
     const pool = await getConnection();
     const result = await pool.request()
@@ -50,19 +57,22 @@ export class Equipment {
         SELECT e.*, 
                sd.SetupDetailName as EquipmentTypeName,
                s.SetupName,
-               u.Username as CreatedByUsername,
-               u.FullName as CreatedByFullName
+               un.UnitName as UnitName,
+               un.UnitCode as UnitCode,
+               usr.Username as CreatedByUsername,
+               usr.FullName as CreatedByFullName
         FROM Equipments e
         LEFT JOIN SetupDetails sd ON e.EquipmentTypeSetupDetailID = sd.SetupDetailID
         LEFT JOIN Setup s ON sd.SMSID = s.SMSID
-        LEFT JOIN Users u ON e.CreatedBy = u.UserID
-        WHERE e.EquipmentTypeSetupDetailID = @EquipmentTypeSetupDetailID
+        LEFT JOIN Unit un ON CAST(e.Unit AS INT) = un.UnitID
+        LEFT JOIN Users usr ON e.CreatedBy = usr.UserID
+        WHERE e.EquipmentTypeSetupDetailID = @EquipmentTypeSetupDetailID AND e.isActive = 1
         ORDER BY e.Equipment
       `);
     return result.recordset;
   }
 
-  // Get equipment by Serial Number
+  // Get equipment by Serial Number (only active ones)
   static async getBySerialNo(serialNo) {
     const pool = await getConnection();
     const result = await pool.request()
@@ -71,18 +81,21 @@ export class Equipment {
         SELECT e.*, 
                sd.SetupDetailName as EquipmentTypeName,
                s.SetupName,
-               u.Username as CreatedByUsername,
-               u.FullName as CreatedByFullName
+               un.UnitName as UnitName,
+               un.UnitCode as UnitCode,
+               usr.Username as CreatedByUsername,
+               usr.FullName as CreatedByFullName
         FROM Equipments e
         LEFT JOIN SetupDetails sd ON e.EquipmentTypeSetupDetailID = sd.SetupDetailID
         LEFT JOIN Setup s ON sd.SMSID = s.SMSID
-        LEFT JOIN Users u ON e.CreatedBy = u.UserID
-        WHERE e.SerialNo = @SerialNo
+        LEFT JOIN Unit un ON CAST(e.Unit AS INT) = un.UnitID
+        LEFT JOIN Users usr ON e.CreatedBy = usr.UserID
+        WHERE e.SerialNo = @SerialNo AND e.isActive = 1
       `);
     return result.recordset[0];
   }
 
-  // Search equipments
+  // Search equipments (only active ones)
   static async search(searchTerm) {
     const pool = await getConnection();
     const searchPattern = `%${searchTerm}%`;
@@ -92,16 +105,21 @@ export class Equipment {
         SELECT e.*, 
                sd.SetupDetailName as EquipmentTypeName,
                s.SetupName,
-               u.Username as CreatedByUsername,
-               u.FullName as CreatedByFullName
+               un.UnitName as UnitName,
+               un.UnitCode as UnitCode,
+               usr.Username as CreatedByUsername,
+               usr.FullName as CreatedByFullName
         FROM Equipments e
         LEFT JOIN SetupDetails sd ON e.EquipmentTypeSetupDetailID = sd.SetupDetailID
         LEFT JOIN Setup s ON sd.SMSID = s.SMSID
-        LEFT JOIN Users u ON e.CreatedBy = u.UserID
-        WHERE e.Equipment LIKE @SearchTerm 
+        LEFT JOIN Unit un ON CAST(e.Unit AS INT) = un.UnitID
+        LEFT JOIN Users usr ON e.CreatedBy = usr.UserID
+        WHERE e.isActive = 1 
+          AND (e.Equipment LIKE @SearchTerm 
            OR e.SerialNo LIKE @SearchTerm 
            OR e.MakeModel LIKE @SearchTerm
            OR sd.SetupDetailName LIKE @SearchTerm
+           OR un.UnitName LIKE @SearchTerm)
         ORDER BY e.Equipment
       `);
     return result.recordset;
@@ -111,7 +129,6 @@ export class Equipment {
   static async create(equipmentData) {
     const pool = await getConnection();
     const result = await pool.request()
-      .input('SNO', sql.NVarChar, equipmentData.sno || null)
       .input('Unit', sql.NVarChar, equipmentData.unit || null)
       .input('EquipmentTypeSetupDetailID', sql.Int, equipmentData.equipmentTypeSetupDetailID)
       .input('Equipment', sql.NVarChar, equipmentData.equipment)
@@ -135,19 +152,20 @@ export class Equipment {
       .input('Remarks', sql.NVarChar, equipmentData.remarks || null)
       .input('ReferenceNo', sql.NVarChar, equipmentData.referenceNo || null)
       .input('CreatedBy', sql.Int, equipmentData.createdBy || null)
+      .input('IsActive', sql.Bit, 1)
       .query(`
         INSERT INTO Equipments (
-          SNO, Unit, EquipmentTypeSetupDetailID, Equipment, SerialNo, MakeModel, Processor, RAM, Storage,
+          Unit, EquipmentTypeSetupDetailID, Equipment, SerialNo, MakeModel, Processor, RAM, Storage,
           OpticalDrive, NIC, PowerSupply, DateOfPurchase, SourceOfProcurement, 
           ContractLPONoDate, Cost, OEMInfo, LocalOEMRep, WarrantyExpiryDate, 
-          SLARecDMDetails, Status, Remarks, ReferenceNo, CreatedBy
+          SLARecDMDetails, Status, Remarks, ReferenceNo, CreatedBy, isActive
         )
         OUTPUT INSERTED.*
         VALUES (
-          @SNO, @Unit, @EquipmentTypeSetupDetailID, @Equipment, @SerialNo, @MakeModel, @Processor, @RAM, @Storage,
+          @Unit, @EquipmentTypeSetupDetailID, @Equipment, @SerialNo, @MakeModel, @Processor, @RAM, @Storage,
           @OpticalDrive, @NIC, @PowerSupply, @DateOfPurchase, @SourceOfProcurement,
           @ContractLPONoDate, @Cost, @OEMInfo, @LocalOEMRep, @WarrantyExpiryDate,
-          @SLARecDMDetails, @Status, @Remarks, @ReferenceNo, @CreatedBy
+          @SLARecDMDetails, @Status, @Remarks, @ReferenceNo, @CreatedBy, @IsActive
         )
       `);
     return result.recordset[0];
@@ -158,7 +176,6 @@ export class Equipment {
     const pool = await getConnection();
     const result = await pool.request()
       .input('EquipmentID', sql.Int, equipmentId)
-      .input('SNO', sql.NVarChar, equipmentData.sno || null)
       .input('Unit', sql.NVarChar, equipmentData.unit || null)
       .input('EquipmentTypeSetupDetailID', sql.Int, equipmentData.equipmentTypeSetupDetailID)
       .input('Equipment', sql.NVarChar, equipmentData.equipment)
@@ -181,10 +198,9 @@ export class Equipment {
       .input('Status', sql.NVarChar, equipmentData.status || null)
       .input('Remarks', sql.NVarChar, equipmentData.remarks || null)
       .input('ReferenceNo', sql.NVarChar, equipmentData.referenceNo || null)
-      .input('UpdatedAt', sql.DateTime, new Date())
       .query(`
         UPDATE Equipments
-        SET SNO = @SNO, Unit = @Unit, EquipmentTypeSetupDetailID = @EquipmentTypeSetupDetailID, 
+        SET Unit = @Unit, EquipmentTypeSetupDetailID = @EquipmentTypeSetupDetailID, 
             Equipment = @Equipment, SerialNo = @SerialNo, MakeModel = @MakeModel,
             Processor = @Processor, RAM = @RAM, Storage = @Storage,
             OpticalDrive = @OpticalDrive, NIC = @NIC, PowerSupply = @PowerSupply,
@@ -192,19 +208,23 @@ export class Equipment {
             ContractLPONoDate = @ContractLPONoDate, Cost = @Cost, OEMInfo = @OEMInfo,
             LocalOEMRep = @LocalOEMRep, WarrantyExpiryDate = @WarrantyExpiryDate,
             SLARecDMDetails = @SLARecDMDetails, Status = @Status, Remarks = @Remarks,
-            ReferenceNo = @ReferenceNo, UpdatedAt = @UpdatedAt
+            ReferenceNo = @ReferenceNo, UpdatedAt = GETDATE()
         OUTPUT INSERTED.*
         WHERE EquipmentID = @EquipmentID
       `);
     return result.recordset[0];
   }
 
-  // Delete equipment
+  // Delete equipment (soft delete - set isActive to 0)
   static async delete(equipmentId) {
     const pool = await getConnection();
     const result = await pool.request()
       .input('EquipmentID', sql.Int, equipmentId)
-      .query('DELETE FROM Equipments WHERE EquipmentID = @EquipmentID');
+      .query(`
+        UPDATE Equipments
+        SET isActive = 0, UpdatedAt = GETDATE()
+        WHERE EquipmentID = @EquipmentID AND isActive = 1
+      `);
     return result.rowsAffected[0] > 0;
   }
 }

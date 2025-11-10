@@ -37,10 +37,9 @@ export class Setup {
     const result = await pool.request()
       .input('SMSID', sql.Int, smsId)
       .input('SetupName', sql.NVarChar, setupData.setupName)
-      .input('UpdatedAt', sql.DateTime, new Date())
       .query(`
         UPDATE Setup
-        SET SetupName = @SetupName, UpdatedAt = @UpdatedAt
+        SET SetupName = @SetupName, UpdatedAt = GETDATE()
         OUTPUT INSERTED.*
         WHERE SMSID = @SMSID
       `);

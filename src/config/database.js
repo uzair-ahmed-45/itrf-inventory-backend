@@ -14,7 +14,6 @@ const config = {
     encrypt: false, // Set to false for local development
     trustServerCertificate: true,
     enableArithAbort: true,
-    // instanceName: 'SQLEXPRESS', // This helps locate the named instance
     connectTimeout: 30000 // Increase timeout to 30 seconds
   },
   pool: {

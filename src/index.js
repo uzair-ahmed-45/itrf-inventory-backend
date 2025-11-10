@@ -10,6 +10,8 @@ import setupRoutes from './routes/setupRoutes.js';
 import setupDetailRoutes from './routes/setupDetailRoutes.js';
 import userRoutes from './routes/userRoutes.js';
 import equipmentRoutes from './routes/equipmentRoutes.js';
+import unitRoutes from './routes/unitRoutes.js';
+import dashboardRoutes from './routes/dashboardRoutes.js';
 
 // Load environment variables
 dotenv.config();
@@ -37,6 +39,8 @@ app.use('/api/setups', setupRoutes);
 app.use('/api/setup-details', setupDetailRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/equipments', equipmentRoutes);
+app.use('/api/units', unitRoutes);
+app.use('/api/dashboard', dashboardRoutes);
 
 // Initialize database and start server
 const startServer = async () => {

@@ -115,6 +115,17 @@ export const searchEquipments = async (req, res) => {
 
 export const createEquipment = async (req, res) => {
   try {
+    // Check if SerialNo is provided and if it already exists
+    if (req.body.serialNo) {
+      const existingEquipment = await Equipment.getBySerialNo(req.body.serialNo);
+      if (existingEquipment) {
+        return res.status(400).json({
+          success: false,
+          message: `Serial Number '${req.body.serialNo}' already exists. Please use a unique serial number.`
+        });
+      }
+    }
+
     const equipment = await Equipment.create(req.body);
     
     res.status(201).json({
@@ -134,6 +145,17 @@ export const createEquipment = async (req, res) => {
 
 export const updateEquipment = async (req, res) => {
   try {
+    // Check if SerialNo is provided and if it already exists for a different equipment
+    if (req.body.serialNo) {
+      const existingEquipment = await Equipment.getBySerialNo(req.body.serialNo);
+      if (existingEquipment && existingEquipment.EquipmentID !== parseInt(req.params.id)) {
+        return res.status(400).json({
+          success: false,
+          message: `Serial Number '${req.body.serialNo}' already exists. Please use a unique serial number.`
+        });
+      }
+    }
+
     const equipment = await Equipment.update(req.params.id, req.body);
     
     if (!equipment) {

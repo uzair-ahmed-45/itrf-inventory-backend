@@ -65,10 +65,9 @@ export class SetupDetail {
       .input('SetupDetailID', sql.Int, setupDetailId)
       .input('SMSID', sql.Int, setupDetailData.smsID)
       .input('SetupDetailName', sql.NVarChar, setupDetailData.setupDetailName)
-      .input('UpdatedAt', sql.DateTime, new Date())
       .query(`
         UPDATE SetupDetails
-        SET SMSID = @SMSID, SetupDetailName = @SetupDetailName, UpdatedAt = @UpdatedAt
+        SET SMSID = @SMSID, SetupDetailName = @SetupDetailName, UpdatedAt = GETDATE()
         OUTPUT INSERTED.*
         WHERE SetupDetailID = @SetupDetailID
       `);
