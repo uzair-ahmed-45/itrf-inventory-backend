@@ -8,6 +8,22 @@ export const initializeDatabase = async () => {
   try {
     console.log('Initializing database tables...');
 
+    // Create Unit table
+    await request.query(`
+      IF NOT EXISTS (SELECT * FROM sysobjects WHERE name='Unit' AND xtype='U')
+      CREATE TABLE Unit (
+        UnitID INT PRIMARY KEY IDENTITY(1,1),
+        UnitCode NVARCHAR(50) NOT NULL UNIQUE,
+        UnitName NVARCHAR(200) NOT NULL,
+        ParentUnit INT,
+        CompanyID INT,
+        IsActive BIT DEFAULT 1,
+        Remarks NVARCHAR(1000),
+        Timestamp DATETIME DEFAULT GETDATE(),
+        FOREIGN KEY (ParentUnit) REFERENCES Unit(UnitID)
+      );
+    `);
+
     // Create Setup table (EquipmentType, Command, SubCommand, etc.)
     await request.query(`
       IF NOT EXISTS (SELECT * FROM sysobjects WHERE name='Setup' AND xtype='U')
@@ -86,6 +102,12 @@ export const initializeDatabase = async () => {
 
     // Create indexes for better query performance
     await request.query(`
+      IF NOT EXISTS (SELECT * FROM sys.indexes WHERE name='IX_Unit_ParentUnit')
+      CREATE INDEX IX_Unit_ParentUnit ON Unit(ParentUnit);
+      
+      IF NOT EXISTS (SELECT * FROM sys.indexes WHERE name='IX_Unit_CompanyID')
+      CREATE INDEX IX_Unit_CompanyID ON Unit(CompanyID);
+      
       IF NOT EXISTS (SELECT * FROM sys.indexes WHERE name='IX_Equipments_SerialNo')
       CREATE INDEX IX_Equipments_SerialNo ON Equipments(SerialNo);
       

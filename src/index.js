@@ -47,8 +47,8 @@ const startServer = async () => {
     console.log('Database connected successfully');
 
     // Initialize database tables
-    console.log('Initializing database tables...');
-    await initDB();
+    // console.log('Initializing database tables...');
+    // await initDB();
     
     // Start server
     app.listen(PORT, () => {
