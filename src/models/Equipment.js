@@ -128,29 +128,36 @@ export class Equipment {
   // Create new equipment
   static async create(equipmentData) {
     const pool = await getConnection();
+    
+    // Helper function to handle empty strings
+    const sanitizeString = (value) => {
+      if (value === null || value === undefined || value === '') return null;
+      return value.toString().trim() || null;
+    };
+
     const result = await pool.request()
-      .input('Unit', sql.NVarChar, equipmentData.unit || null)
+      .input('Unit', sql.NVarChar, sanitizeString(equipmentData.unit))
       .input('EquipmentTypeSetupDetailID', sql.Int, equipmentData.equipmentTypeSetupDetailID)
       .input('Equipment', sql.NVarChar, equipmentData.equipment)
-      .input('SerialNo', sql.NVarChar, equipmentData.serialNo || null)
-      .input('MakeModel', sql.NVarChar, equipmentData.makeModel || null)
-      .input('Processor', sql.NVarChar, equipmentData.processor || null)
-      .input('RAM', sql.NVarChar, equipmentData.ram || null)
-      .input('Storage', sql.NVarChar, equipmentData.storage || null)
-      .input('OpticalDrive', sql.NVarChar, equipmentData.opticalDrive || null)
-      .input('NIC', sql.NVarChar, equipmentData.nic || null)
-      .input('PowerSupply', sql.NVarChar, equipmentData.powerSupply || null)
+      .input('SerialNo', sql.NVarChar, sanitizeString(equipmentData.serialNo))
+      .input('MakeModel', sql.NVarChar, sanitizeString(equipmentData.makeModel))
+      .input('Processor', sql.NVarChar, sanitizeString(equipmentData.processor))
+      .input('RAM', sql.NVarChar, sanitizeString(equipmentData.ram))
+      .input('Storage', sql.NVarChar, sanitizeString(equipmentData.storage))
+      .input('OpticalDrive', sql.NVarChar, sanitizeString(equipmentData.opticalDrive))
+      .input('NIC', sql.NVarChar, sanitizeString(equipmentData.nic))
+      .input('PowerSupply', sql.NVarChar, sanitizeString(equipmentData.powerSupply))
       .input('DateOfPurchase', sql.Date, equipmentData.dateOfPurchase || null)
-      .input('SourceOfProcurement', sql.NVarChar, equipmentData.sourceOfProcurement || null)
-      .input('ContractLPONoDate', sql.NVarChar, equipmentData.contractLPONoDate || null)
+      .input('SourceOfProcurement', sql.NVarChar, sanitizeString(equipmentData.sourceOfProcurement))
+      .input('ContractLPONoDate', sql.NVarChar, sanitizeString(equipmentData.contractLPONoDate))
       .input('Cost', sql.Decimal(18, 2), equipmentData.cost || null)
-      .input('OEMInfo', sql.NVarChar, equipmentData.oemInfo || null)
-      .input('LocalOEMRep', sql.NVarChar, equipmentData.localOEMRep || null)
+      .input('OEMInfo', sql.NVarChar, sanitizeString(equipmentData.oemInfo))
+      .input('LocalOEMRep', sql.NVarChar, sanitizeString(equipmentData.localOEMRep))
       .input('WarrantyExpiryDate', sql.Date, equipmentData.warrantyExpiryDate || null)
-      .input('SLARecDMDetails', sql.NVarChar, equipmentData.slaRecDMDetails || null)
-      .input('Status', sql.NVarChar, equipmentData.status || null)
-      .input('Remarks', sql.NVarChar, equipmentData.remarks || null)
-      .input('ReferenceNo', sql.NVarChar, equipmentData.referenceNo || null)
+      .input('SLARecDMDetails', sql.NVarChar, sanitizeString(equipmentData.slaRecDMDetails))
+      .input('Status', sql.NVarChar, sanitizeString(equipmentData.status))
+      .input('Remarks', sql.NVarChar, sanitizeString(equipmentData.remarks))
+      .input('ReferenceNo', sql.NVarChar, sanitizeString(equipmentData.referenceNo))
       .input('CreatedBy', sql.Int, equipmentData.createdBy || null)
       .input('IsActive', sql.Bit, 1)
       .query(`
@@ -174,30 +181,37 @@ export class Equipment {
   // Update equipment
   static async update(equipmentId, equipmentData) {
     const pool = await getConnection();
+    
+    // Helper function to handle empty strings
+    const sanitizeString = (value) => {
+      if (value === null || value === undefined || value === '') return null;
+      return value.toString().trim() || null;
+    };
+
     const result = await pool.request()
       .input('EquipmentID', sql.Int, equipmentId)
-      .input('Unit', sql.NVarChar, equipmentData.unit || null)
+      .input('Unit', sql.NVarChar, sanitizeString(equipmentData.unit))
       .input('EquipmentTypeSetupDetailID', sql.Int, equipmentData.equipmentTypeSetupDetailID)
       .input('Equipment', sql.NVarChar, equipmentData.equipment)
-      .input('SerialNo', sql.NVarChar, equipmentData.serialNo || null)
-      .input('MakeModel', sql.NVarChar, equipmentData.makeModel || null)
-      .input('Processor', sql.NVarChar, equipmentData.processor || null)
-      .input('RAM', sql.NVarChar, equipmentData.ram || null)
-      .input('Storage', sql.NVarChar, equipmentData.storage || null)
-      .input('OpticalDrive', sql.NVarChar, equipmentData.opticalDrive || null)
-      .input('NIC', sql.NVarChar, equipmentData.nic || null)
-      .input('PowerSupply', sql.NVarChar, equipmentData.powerSupply || null)
+      .input('SerialNo', sql.NVarChar, sanitizeString(equipmentData.serialNo))
+      .input('MakeModel', sql.NVarChar, sanitizeString(equipmentData.makeModel))
+      .input('Processor', sql.NVarChar, sanitizeString(equipmentData.processor))
+      .input('RAM', sql.NVarChar, sanitizeString(equipmentData.ram))
+      .input('Storage', sql.NVarChar, sanitizeString(equipmentData.storage))
+      .input('OpticalDrive', sql.NVarChar, sanitizeString(equipmentData.opticalDrive))
+      .input('NIC', sql.NVarChar, sanitizeString(equipmentData.nic))
+      .input('PowerSupply', sql.NVarChar, sanitizeString(equipmentData.powerSupply))
       .input('DateOfPurchase', sql.Date, equipmentData.dateOfPurchase || null)
-      .input('SourceOfProcurement', sql.NVarChar, equipmentData.sourceOfProcurement || null)
-      .input('ContractLPONoDate', sql.NVarChar, equipmentData.contractLPONoDate || null)
+      .input('SourceOfProcurement', sql.NVarChar, sanitizeString(equipmentData.sourceOfProcurement))
+      .input('ContractLPONoDate', sql.NVarChar, sanitizeString(equipmentData.contractLPONoDate))
       .input('Cost', sql.Decimal(18, 2), equipmentData.cost || null)
-      .input('OEMInfo', sql.NVarChar, equipmentData.oemInfo || null)
-      .input('LocalOEMRep', sql.NVarChar, equipmentData.localOEMRep || null)
+      .input('OEMInfo', sql.NVarChar, sanitizeString(equipmentData.oemInfo))
+      .input('LocalOEMRep', sql.NVarChar, sanitizeString(equipmentData.localOEMRep))
       .input('WarrantyExpiryDate', sql.Date, equipmentData.warrantyExpiryDate || null)
-      .input('SLARecDMDetails', sql.NVarChar, equipmentData.slaRecDMDetails || null)
-      .input('Status', sql.NVarChar, equipmentData.status || null)
-      .input('Remarks', sql.NVarChar, equipmentData.remarks || null)
-      .input('ReferenceNo', sql.NVarChar, equipmentData.referenceNo || null)
+      .input('SLARecDMDetails', sql.NVarChar, sanitizeString(equipmentData.slaRecDMDetails))
+      .input('Status', sql.NVarChar, sanitizeString(equipmentData.status))
+      .input('Remarks', sql.NVarChar, sanitizeString(equipmentData.remarks))
+      .input('ReferenceNo', sql.NVarChar, sanitizeString(equipmentData.referenceNo))
       .query(`
         UPDATE Equipments
         SET Unit = @Unit, EquipmentTypeSetupDetailID = @EquipmentTypeSetupDetailID, 

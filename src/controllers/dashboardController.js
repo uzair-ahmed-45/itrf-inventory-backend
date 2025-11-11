@@ -108,14 +108,18 @@ export const getEquipmentByCommand = async (req, res) => {
     
     const result = await pool.request().query(`
       SELECT 
-        un.UnitID,
-        un.UnitName as CommandName,
-        un.CompanyID,
+        cmd.UnitID,
+        cmd.UnitName as CommandName,
+        cmd.CompanyID,
         COUNT(e.EquipmentID) as Count
-      FROM Unit un
-      LEFT JOIN Equipments e ON CAST(e.Unit AS INT) = un.UnitID AND e.isActive = 1
-      WHERE un.CompanyID = 1 AND un.IsActive = 1
-      GROUP BY un.UnitID, un.UnitName, un.CompanyID
+      FROM Unit cmd
+      LEFT JOIN Unit childUnit ON childUnit.ParentUnit = cmd.UnitID OR childUnit.UnitID = cmd.UnitID
+      LEFT JOIN Equipments e ON CAST(e.Unit AS INT) = childUnit.UnitID AND e.isActive = 1
+      WHERE cmd.CompanyID = 1 
+        AND cmd.IsActive = 1 
+        AND cmd.UnitName != 'NHQ'
+        AND cmd.ParentUnit IS NOT NULL
+      GROUP BY cmd.UnitID, cmd.UnitName, cmd.CompanyID
       HAVING COUNT(e.EquipmentID) > 0
       ORDER BY Count DESC
     `);
