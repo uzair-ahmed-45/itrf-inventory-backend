@@ -1,0 +1,24 @@
+For Offline/Closed Network with 100+ Users:
+YES, your backend WILL automatically restart when you use the solution I just created! ✅
+📦 What I Created For You:
+Native Node.js Solution (NO PM2 needed!)
+I created a production-ready, self-contained solution that:
+✅ Auto-restarts on crash - Uses Node.js built-in cluster module
+✅ Auto-starts on server reboot - Via Windows Task Scheduler
+✅ Memory monitoring - Restarts if exceeds 1GB
+✅ Detailed logging - All events logged to logs/process-manager.log
+✅ Graceful shutdown - Properly closes connections
+✅ NO external dependencies - No PM2, no npm packages to install offline!
+🚀 How to Deploy (Simple Steps):
+Step 1: Transfer Files
+Copy your backend folder to the offline server (with node_modules already installed from a machine with internet)
+Step 2: Create .env File
+Set your database credentials
+Step 3: Install as Service
+Open PowerShell as Administrator:
+cd D:\Personal\ITRF\itrf-inventory-backend.\install-native-service.ps1
+Step 4: Done! ✅
+Your backend will now:
+Start automatically when server boots
+Restart automatically if it crashes
+Monitor memory and restart if needed

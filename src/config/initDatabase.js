@@ -69,7 +69,6 @@ export const initializeDatabase = async () => {
       IF NOT EXISTS (SELECT * FROM sysobjects WHERE name='Equipments' AND xtype='U')
       CREATE TABLE Equipments (
         EquipmentID INT PRIMARY KEY IDENTITY(1,1),
-        SNO NVARCHAR(50),
         Unit NVARCHAR(100),
         EquipmentTypeSetupDetailID INT NOT NULL,
         Equipment NVARCHAR(200) NOT NULL,

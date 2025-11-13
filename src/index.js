@@ -43,6 +43,8 @@ app.use('/api/units', unitRoutes);
 app.use('/api/dashboard', dashboardRoutes);
 
 // Initialize database and start server
+let server;
+
 const startServer = async () => {
   try {
     // Connect to database
@@ -55,7 +57,7 @@ const startServer = async () => {
     // await initDB();
     
     // Start server
-    app.listen(PORT, () => {
+    server = app.listen(PORT, () => {
       console.log(`Server is running on port ${PORT}`);
       console.log(`API endpoints available at http://localhost:${PORT}/api`);
     });
@@ -68,18 +70,31 @@ const startServer = async () => {
 // Handle graceful shutdown
 process.on('SIGTERM', async () => {
   console.log('SIGTERM received. Shutting down gracefully...');
-  // Close database connections if needed
-  process.exit(0);
+  if (server) {
+    server.close(() => {
+      console.log('Server closed');
+      process.exit(0);
+    });
+  } else {
+    process.exit(0);
+  }
 });
 
 process.on('SIGINT', async () => {
   console.log('SIGINT received. Shutting down gracefully...');
-  // Close database connections if needed
-  process.exit(0);
+  if (server) {
+    server.close(() => {
+      console.log('Server closed');
+      process.exit(0);
+    });
+  } else {
+    process.exit(0);
+  }
 });
 
 // Start the server
 startServer();
 
 export default app;
+export { server };
 
