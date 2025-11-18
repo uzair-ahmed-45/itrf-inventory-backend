@@ -3,6 +3,15 @@ import cors from 'cors';
 import dotenv from 'dotenv';
 import { getConnection } from './config/database.js';
 import { initializeDatabase as initDB } from './config/initDatabase.js';
+import cors from 'cors';
+
+app.use(cors({
+    origin: "http://133.125.99.61:5173",
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization"],
+}));
+
+app.options("*", cors()); // VERY IMPORTANT
 
 // Import routes
 import authRoutes from './routes/authRoutes.js';
